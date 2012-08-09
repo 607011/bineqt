@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: stereogramwidget.h 4c4b9af1b662 2012/06/11 15:28:04 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #ifndef __VIDEOWIDGET_H_
 #define __VIDEOWIDGET_H_

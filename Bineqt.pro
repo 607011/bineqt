@@ -1,6 +1,5 @@
 # Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 # All rights reserved.
-# $Id: Bineqt.pro 9a383954a478 2012/08/08 14:55:58 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 QT += core gui opengl multimedia
 

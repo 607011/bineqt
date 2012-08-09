@@ -1,6 +1,5 @@
 // Copyright (c) 2011 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: nui.h a207395837b2 2012/06/11 15:19:01 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #ifndef __NUI_H_
 #define __NUI_H_

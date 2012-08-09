@@ -1,6 +1,5 @@
 // Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: mainwindow.cpp 9a383954a478 2012/08/08 14:55:58 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #include <QSettings>
 #include <QFileDialog>
@@ -88,7 +87,7 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(ui->farSlider, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setFarClipping(int)));
     QObject::connect(ui->muSlider, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setMu(int)));
     QObject::connect(ui->resolutionSpinBox, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setResolution(int)));
-    QObject::connect(ui->swapFrontBackCheckBox, SIGNAL(toggled(bool)), mStereogramWidget, SLOT(setFrontBackSwap(bool)));
+    // QObject::connect(ui->swapFrontBackCheckBox, SIGNAL(toggled(bool)), mStereogramWidget, SLOT(setFrontBackSwap(bool)));
     QObject::connect(ui->overlayDepthSlider, SIGNAL(valueChanged(int)), mDepthWidget, SLOT(setOverlayFrameOpacity(int)));
     QObject::connect(ui->tiltSpinBox, SIGNAL(valueChanged(int)), SLOT(setTilt(int)));
     QObject::connect(ui->eyeDistanceSpinBox, SIGNAL(valueChanged(int)), SLOT(setEyeDistance(int)));
@@ -171,7 +170,7 @@ void MainWindow::saveAppSettings(void)
     settings.setValue("MainWindow/textureFileName", mTextureFileName);
     settings.setValue("MainWindow/nearClippingValue", ui->nearSlider->value());
     settings.setValue("MainWindow/farClippingValue", ui->farSlider->value());
-    settings.setValue("MainWindow/swapFrontBack", ui->swapFrontBackCheckBox->checkState() == Qt::Checked);
+    // settings.setValue("MainWindow/swapFrontBack", ui->swapFrontBackCheckBox->checkState() == Qt::Checked);
     settings.setValue("MainWindow/overlayDepthOpacity", ui->overlayDepthSlider->value());
     settings.setValue("MainWindow/mu", ui->muSlider->value());
     settings.setValue("MainWindow/frozen", ui->freezePushButton->isChecked());
@@ -191,7 +190,7 @@ void MainWindow::restoreAppSettings(void)
     loadTexture(mTextureFileName);
     ui->nearSlider->setValue(settings.value("MainWindow/nearClippingValue").toInt());
     ui->farSlider->setValue(settings.value("MainWindow/farClippingValue").toInt());
-    ui->swapFrontBackCheckBox->setChecked(settings.value("MainWindow/swapFrontBack").toBool());
+    // ui->swapFrontBackCheckBox->setChecked(settings.value("MainWindow/swapFrontBack").toBool());
     ui->overlayDepthSlider->setValue(settings.value("MainWindow/overlayDepthOpacity").toInt());
     ui->muSlider->setValue(settings.value("MainWindow/mu").toInt());
     ui->freezePushButton->setChecked(settings.value("MainWindow/frozen").toBool());

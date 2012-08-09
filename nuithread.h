@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: nuithread.h 487ecbee7e01 2012/06/01 14:34:02 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #ifndef __NUITHREAD_H_
 #define __NUITHREAD_H_

@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: nuithread.cpp 2cd7b967385f 2012/06/04 15:28:18 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #include "nuithread.h"
 

@@ -1,6 +1,5 @@
 // Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: mainwindow.h 6bf84c771de0 2012/06/07 13:05:09 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #ifndef __MAINWINDOW_H_
 #define __MAINWINDOW_H_

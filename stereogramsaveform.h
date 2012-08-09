@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: stereogramsaveform.h da5b9776da65 2012/06/06 14:36:01 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 #ifndef __STEREOGRAMSAVEFORM_H_
 #define __STEREOGRAMSAVEFORM_H_

@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 // All rights reserved.
-// $Id: nui.cpp a207395837b2 2012/06/11 15:19:01 Oliver Lau <oliver@von-und-fuer-lau.de> $
 
 
 #include <QtCore>
