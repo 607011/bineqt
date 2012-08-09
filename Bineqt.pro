@@ -38,10 +38,16 @@ FORMS += mainwindow.ui \
     stereogramsaveform.ui
 
 RESOURCES += \
-    Textures.qrc
+    Textures.qrc \
+    Images.qrc
 
 OTHER_FILES += \
-    TODO.txt
+    TODO.txt \
+    Bineqt.rc
+
+RC_FILE = Bineqt.rc
+
+
 
 
 
