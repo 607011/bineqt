@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Texturen/Stereogram_Tut_Random_Dot_S.png</file>
+        <file>Texturen/Stereogram_Tut_Rectangles_Pattern.png</file>
+        <file>Texturen/tile.png</file>
+    </qresource>
+</RCC>
