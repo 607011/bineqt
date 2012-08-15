@@ -18,6 +18,8 @@
 #include <omp.h>
 #endif
 
+#define IFA_MODE 1
+
 const QString MainWindow::Company = "ct.de";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
@@ -31,6 +33,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , mDepthFrameFrozen(false)
+    , mFileSequenceNumber(0)
 {
     QCoreApplication::setOrganizationName(MainWindow::Company);
     QCoreApplication::setOrganizationDomain(MainWindow::Company);
@@ -179,6 +182,7 @@ void MainWindow::saveAppSettings(void)
     settings.setValue("MainWindow/fitFrame", ui->fitFrameCheckBox->isChecked());
     settings.setValue("MainWindow/patternMode", ui->modeComboBox->currentIndex());
     settings.setValue("MainWindow/stereogramSize", ui->stereogramSizeComboBox->currentIndex());
+    settings.setValue("MainWindow/fileSequenceNumber", mFileSequenceNumber);
     settings.setValue("SavedStereogram/size", mSavedStereogramSize);
 }
 
@@ -202,6 +206,7 @@ void MainWindow::restoreAppSettings(void)
     ui->modeComboBox->setCurrentIndex(settings.value("MainWindow/patternMode").toInt());
     ui->stereogramSizeComboBox->setCurrentIndex(settings.value("MainWindow/stereogramSize").toInt());
     mSavedStereogramSize = settings.value("SavedStereogram/size", QSize(640, 480)).toSize();
+    mFileSequenceNumber = settings.value("MainWindow/fileSequenceNumber", 0).toInt();
     placeStereogramWidget();
 }
 
@@ -263,12 +268,21 @@ void MainWindow::printStereogram(void)
     if (printDialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
         QRect rect = painter.viewport();
-        const QImage& stereogram = mStereogramWidget->stereogram(QSize(1653, 1240) /* DIN A4 @ 150 dpi */);
-        QSize size = stereogram.size();
+        const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
+        QSize size = stereogramPrint.size();
         size.scale(rect.size(), Qt::KeepAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
-        painter.setWindow(stereogram.rect());
-        painter.drawImage(0, 0, stereogram);
+        painter.setWindow(stereogramPrint.rect());
+        painter.drawImage(0, 0, stereogramPrint);
+#ifdef IFA_MODE
+        const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
+        const QString stereogramFilename = QString("%1.png").arg(++mFileSequenceNumber);
+        const bool success = stereogramFile.save(stereogramFilename);
+        if (success)
+            statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
+        else
+            statusBar()->showMessage(tr("Beim Speichern des Bildes '%1' ist etwas schiefgegangen.").arg(stereogramFilename), 20000);
+#endif
     }
 }
 

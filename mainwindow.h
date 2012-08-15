@@ -64,6 +64,8 @@ private:
     QImage mTexture;
     bool mDepthFrameFrozen;
     QSize mSavedStereogramSize;
+
+    int mFileSequenceNumber;
 };
 
 #endif // __MAINWINDOW_H_
