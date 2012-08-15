@@ -40,6 +40,7 @@ private slots:
     void openTexture(void);
     void saveDepthImage(void);
     void saveStereogram(void);
+    void printStereogram(void);
     void freezeToggled(bool running = false);
     void setEyeDistance(int /* mm */);
     void setTilt(int);
@@ -62,6 +63,7 @@ private:
     QString mTextureFileName;
     QImage mTexture;
     bool mDepthFrameFrozen;
+    QSize mSavedStereogramSize;
 };
 
 #endif // __MAINWINDOW_H_

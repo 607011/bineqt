@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>458</width>
-    <height>553</height>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -182,7 +182,7 @@
            <number>100</number>
           </property>
           <property name="value">
-           <number>1</number>
+           <number>333</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -370,8 +370,15 @@
     </property>
     <addaction name="actionDetachStereogram"/>
    </widget>
+   <widget class="QMenu" name="menuPrint">
+    <property name="title">
+     <string>Drucken</string>
+    </property>
+    <addaction name="actionPrintAutostereogram"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuWindow"/>
+   <addaction name="menuPrint"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -408,12 +415,18 @@
   </action>
   <action name="actionSaveDepthImageAs">
    <property name="text">
-    <string>Tiefenbild speichern als ...</string>
+    <string>Tiefenbild speichern als ... (Strg+S)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSaveStereogramAs">
    <property name="text">
-    <string>Stereogramm speichern als ...</string>
+    <string>Stereogramm speichern als ... (Umsch+Strg+S)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionDetachStereogram">
@@ -428,6 +441,14 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPrintAutostereogram">
+   <property name="text">
+    <string>Autostereogram (Strg+P)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

@@ -14,10 +14,8 @@ StereogramSaveForm::StereogramSaveForm(StereogramWidget* stereogramWidget, const
     , mImageSize(imageSize)
 {
     ui->setupUi(this);
-
     ui->widthSpinBox->setValue(mImageSize.width());
     ui->heightSpinBox->setValue(mImageSize.height());
-
     QObject::connect(ui->saveDepthImagePushButton, SIGNAL(clicked()), SLOT(saveStereogram()));
     QObject::connect(ui->finishedPushButton, SIGNAL(clicked()), SLOT(accept()));
 }
@@ -33,8 +31,8 @@ void StereogramSaveForm::saveStereogram(void) {
     const QString& stereogramFilename = QFileDialog::getSaveFileName(this, tr("Stereogramm speichern"));
     if (stereogramFilename == "")
         return;
-    const QSize requestedSize = QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
-    const QImage& stereogram = mStereogramWidget->stereogram(requestedSize);
+    mChosenImageSize = QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
+    const QImage& stereogram = mStereogramWidget->stereogram(mChosenImageSize);
     const bool rc = stereogram.save(stereogramFilename);
     if (rc) {
         QMessageBox::information(this, tr("Stereogramm gespeichert"), tr("Stereogramm wurde erfolgreich unter dem Namen '%1' gespeichert.").arg(stereogramFilename));

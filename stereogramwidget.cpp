@@ -25,7 +25,6 @@ StereogramWidget::StereogramWidget(QWidget* parent)
     , mMu(1.0f / 3.0f)
     , mEyeDist(2.64f) /* inch */
     , mResolution(94) /* dpi */
-    , mSwapFrontBack(true)
     , mTextureMode(TileTexture)
     , mNearClipping(NUI_IMAGE_DEPTH_MINIMUM)
     , mFarClipping(NUI_IMAGE_DEPTH_MAXIMUM)
@@ -180,11 +179,10 @@ void StereogramWidget::calcStereogram(void)
     mStereogram = QImage(mRequestedStereogramSize, QImage::Format_RGB32);
     if (mTexture.isNull())
         return;
-    DepthData::DepthDataType::const_iterator data = mScaledDepthData.data().begin();
-    DepthData::DepthDataType sameArr(mStereogram.width());
     for (int y = 0; y < mScaledDepthData.size().height(); ++y) {
+        DepthData::DepthDataType sameArr(mStereogram.width());
+        DepthData::DepthDataType::const_iterator data = y * mScaledDepthData.size().width() + mScaledDepthData.data().begin();
         makeSameArray(sameArr, data, mScaledDepthData.size().width() / mStereogram.width());
-        data += mScaledDepthData.size().width();
         QRgb* const dst = reinterpret_cast<QRgb*>(mStereogram.scanLine(y));
         const QRgb* const src = reinterpret_cast<QRgb*>(mTexture.scanLine(y));
         int x = mStereogram.width();
@@ -227,13 +225,6 @@ void StereogramWidget::setRequestedStereogramSize(const QSize& requestedSize)
 {
     mRequestedStereogramSize = requestedSize;
     invalidateTexture();
-    update();
-}
-
-
-void StereogramWidget::setFrontBackSwap(bool doSwap)
-{
-    mSwapFrontBack = doSwap;
     update();
 }
 

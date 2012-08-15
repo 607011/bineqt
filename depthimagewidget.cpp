@@ -125,9 +125,6 @@ void DepthImageWidget::setFitFrameIntoDepthFrame(bool doFit)
 }
 
 
-
-
-
 void DepthImageWidget::setDepthData(const quint16* data, const QSize& frameSize)
 {
     if (data == NULL)
@@ -264,7 +261,6 @@ void DepthImageWidget::dropEvent(QDropEvent* e)
         if (file.contains(QRegExp("file://.*\\.(png|jpg)$"))) {
             QImage depthImage = QImage(file.remove("file:///"));
             if (!depthImage.isNull()) {
-                qDebug() << "DepthImageWidget::dropEvent(); depthImage.size() =" << depthImage.size();
                 emit stopStreaming();
                 mFarClipping = 256;
                 mNearClipping = 0;
@@ -283,6 +279,9 @@ void DepthImageWidget::dropEvent(QDropEvent* e)
                             break;
                         case COLOR_NEAR_CLIPPING:
                             c = 255;
+                            break;
+                        default:
+                            // do nothing
                             break;
                         }
                         *aDepth++ = 256-(quint16)qGray(c);

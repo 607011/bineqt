@@ -19,11 +19,13 @@ class StereogramSaveForm : public QDialog
 public:
     explicit StereogramSaveForm(StereogramWidget* stereogramWidget, const QSize& imageSize, QWidget* parent = NULL);
     ~StereogramSaveForm();
+    const QSize& chosenImageSize(void) const { return mChosenImageSize; }
 
 private:
     Ui::StereogramSaveForm *ui;
     StereogramWidget* mStereogramWidget;
     QSize mImageSize;
+    QSize mChosenImageSize;
 
 private slots:
     void saveStereogram(void);

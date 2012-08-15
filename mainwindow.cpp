@@ -3,8 +3,11 @@
 
 #include <QSettings>
 #include <QFileDialog>
+#include <QPrinter>
+#include <QPrintDialog>
 #include <QMessageBox>
 #include <QtCore/QtDebug>
+#include <QPainter>
 
 #include "nui.h"
 #include "mainwindow.h"
@@ -15,13 +18,12 @@
 #include <omp.h>
 #endif
 
-
 const QString MainWindow::Company = "ct.de";
-const QString MainWindow::AppName = QObject::tr("Live Autostereogramm");
-#ifndef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.1 DEBUG $Date: 2012/08/08 14:55:58 $";
+const QString MainWindow::AppName = QObject::tr("Bineqt");
+#ifdef QT_NO_DEBUG
+const QString MainWindow::AppVersion = "0.9.1";
 #else
-const QString MainWindow::AppVersion = "0.1";
+const QString MainWindow::AppVersion = "0.9.1 [DEBUG]";
 #endif
 
 
@@ -36,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
     QSettings::setDefaultFormat(QSettings::NativeFormat);
 
     ui->setupUi(this);
-    setWindowTitle(tr("%1 %2 %3").arg(MainWindow::AppName).arg(MainWindow::AppVersion).arg(_OPENMP));
+    setWindowTitle(tr("%1 %2 %3").arg(MainWindow::AppName).arg(MainWindow::AppVersion).arg(_OPENMP >= 200203? "MP" : ""));
 
     ui->modeComboBox->addItem(tr("Kacheln"), QVariant(StereogramWidget::TileTexture));
     ui->modeComboBox->addItem(tr("Aufspannen"), QVariant(StereogramWidget::StretchTexture));
@@ -75,6 +77,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     QObject::connect(ui->actionSaveDepthImageAs, SIGNAL(triggered()), SLOT(saveDepthImage()));
     QObject::connect(ui->actionSaveStereogramAs, SIGNAL(triggered()), SLOT(saveStereogram()));
+    QObject::connect(ui->actionPrintAutostereogram, SIGNAL(triggered()), SLOT(printStereogram()));
     QObject::connect(ui->actionOpenTexture, SIGNAL(triggered()), SLOT(openTexture()));
     QObject::connect(ui->actionQuit, SIGNAL(triggered()), SLOT(close()));
     QObject::connect(ui->actionFreeze, SIGNAL(toggled(bool)), SLOT(freezeToggled(bool)), Qt::DirectConnection);
@@ -87,7 +90,6 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(ui->farSlider, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setFarClipping(int)));
     QObject::connect(ui->muSlider, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setMu(int)));
     QObject::connect(ui->resolutionSpinBox, SIGNAL(valueChanged(int)), mStereogramWidget, SLOT(setResolution(int)));
-    // QObject::connect(ui->swapFrontBackCheckBox, SIGNAL(toggled(bool)), mStereogramWidget, SLOT(setFrontBackSwap(bool)));
     QObject::connect(ui->overlayDepthSlider, SIGNAL(valueChanged(int)), mDepthWidget, SLOT(setOverlayFrameOpacity(int)));
     QObject::connect(ui->tiltSpinBox, SIGNAL(valueChanged(int)), SLOT(setTilt(int)));
     QObject::connect(ui->eyeDistanceSpinBox, SIGNAL(valueChanged(int)), SLOT(setEyeDistance(int)));
@@ -170,32 +172,36 @@ void MainWindow::saveAppSettings(void)
     settings.setValue("MainWindow/textureFileName", mTextureFileName);
     settings.setValue("MainWindow/nearClippingValue", ui->nearSlider->value());
     settings.setValue("MainWindow/farClippingValue", ui->farSlider->value());
-    // settings.setValue("MainWindow/swapFrontBack", ui->swapFrontBackCheckBox->checkState() == Qt::Checked);
     settings.setValue("MainWindow/overlayDepthOpacity", ui->overlayDepthSlider->value());
     settings.setValue("MainWindow/mu", ui->muSlider->value());
+    settings.setValue("MainWindow/resolution", ui->resolutionSpinBox->value());
     settings.setValue("MainWindow/frozen", ui->freezePushButton->isChecked());
     settings.setValue("MainWindow/fitFrame", ui->fitFrameCheckBox->isChecked());
+    settings.setValue("MainWindow/patternMode", ui->modeComboBox->currentIndex());
+    settings.setValue("MainWindow/stereogramSize", ui->stereogramSizeComboBox->currentIndex());
+    settings.setValue("SavedStereogram/size", mSavedStereogramSize);
 }
 
 
 void MainWindow::restoreAppSettings(void)
 {
     QSettings settings(MainWindow::Company, MainWindow::AppName);
-    NUI::instance()->setTilt(0 /*settings.value("Kinect/tilt").toInt()*/);
+    NUI::instance()->setTilt(settings.value("Kinect/tilt").toInt());
     restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
     restoreState(settings.value("MainWindow/windowState").toByteArray());
-    mTextureFileName = settings.value("MainWindow/textureFileName").toString();
-    if (mTextureFileName == "")
-        mTextureFileName = ":/Texturen/Stereogram_Tut_Random_Dot_S.png";
+    mTextureFileName = settings.value("MainWindow/textureFileName", ":/Texturen/tile.png").toString();
     loadTexture(mTextureFileName);
-    ui->nearSlider->setValue(settings.value("MainWindow/nearClippingValue").toInt());
-    ui->farSlider->setValue(settings.value("MainWindow/farClippingValue").toInt());
-    // ui->swapFrontBackCheckBox->setChecked(settings.value("MainWindow/swapFrontBack").toBool());
-    ui->overlayDepthSlider->setValue(settings.value("MainWindow/overlayDepthOpacity").toInt());
-    ui->muSlider->setValue(settings.value("MainWindow/mu").toInt());
+    ui->nearSlider->setValue(settings.value("MainWindow/nearClippingValue", 0).toInt());
+    ui->farSlider->setValue(settings.value("MainWindow/farClippingValue", 160).toInt());
+    ui->overlayDepthSlider->setValue(settings.value("MainWindow/overlayDepthOpacity", 20).toInt());
+    ui->muSlider->setValue(settings.value("MainWindow/mu", 333).toInt());
+    ui->resolutionSpinBox->setValue(settings.value("MainWindow/resolution", 94).toInt());
     ui->freezePushButton->setChecked(settings.value("MainWindow/frozen").toBool());
     freezeToggled(ui->freezePushButton->isChecked());
     ui->fitFrameCheckBox->setChecked(settings.value("MainWindow/fitFrame").toBool());
+    ui->modeComboBox->setCurrentIndex(settings.value("MainWindow/patternMode").toInt());
+    ui->stereogramSizeComboBox->setCurrentIndex(settings.value("MainWindow/stereogramSize").toInt());
+    mSavedStereogramSize = settings.value("SavedStereogram/size", QSize(640, 480)).toSize();
     placeStereogramWidget();
 }
 
@@ -213,7 +219,6 @@ void MainWindow::loadTexture(const QString& filename)
             QMessageBox::warning(this, tr("Fehler beim Laden der Textur"), tr("Textur konnte nicht geladen werden."));
         }
     }
-
 }
 
 
@@ -243,9 +248,28 @@ void MainWindow::saveStereogram(void)
         QMessageBox::critical(this, tr("Stereogramm kann nicht gespeichert werden"), tr("Stereogramm kann nicht gespeichert werden, weil Tiefeninformationen fehlen"));
         return;
     }
-    StereogramSaveForm saveForm(mStereogramWidget, mDepthWidget->depthImage().size(), this);
+    QSize requestedStereogramSize = mSavedStereogramSize.isEmpty()? mDepthWidget->depthImage().size() : mSavedStereogramSize;
+    StereogramSaveForm saveForm(mStereogramWidget, requestedStereogramSize, this);
     int rc = saveForm.exec();
-    Q_UNUSED(rc);
+    if (rc == QDialog::Accepted)
+        mSavedStereogramSize = saveForm.chosenImageSize();
+}
+
+
+void MainWindow::printStereogram(void)
+{
+    QPrinter printer(QPrinter::HighResolution);
+    QPrintDialog printDialog(&printer, this);
+    if (printDialog.exec() == QDialog::Accepted) {
+        QPainter painter(&printer);
+        QRect rect = painter.viewport();
+        const QImage& stereogram = mStereogramWidget->stereogram(QSize(1653, 1240) /* DIN A4 @ 150 dpi */);
+        QSize size = stereogram.size();
+        size.scale(rect.size(), Qt::KeepAspectRatio);
+        painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
+        painter.setWindow(stereogram.rect());
+        painter.drawImage(0, 0, stereogram);
+    }
 }
 
 

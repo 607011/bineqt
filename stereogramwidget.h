@@ -64,7 +64,6 @@ private:
     float mMu;
     float mEyeDist; /* inch */
     int mResolution; /* DPI */
-    bool mSwapFrontBack;
     TextureMode mTextureMode;
     DepthData mOriginalDepthData;
     DepthData mScaledDepthData;
@@ -87,7 +86,6 @@ public slots:
     void setEyeDistance(float /* inch */);
     void setMu(int);
     void setResolution(int resolution);
-    void setFrontBackSwap(bool doSwap);
     void setTextureMode(TextureMode);
     void setDepthData(const quint16*, const QSize&);
 
