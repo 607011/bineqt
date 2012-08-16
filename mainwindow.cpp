@@ -26,9 +26,9 @@
 const QString MainWindow::Company = "ct.de";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.1";
+const QString MainWindow::AppVersion = "0.9.2-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.1 [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.2-IFA [DEBUG]";
 #endif
 
 
@@ -292,7 +292,6 @@ void MainWindow::printStereogram(void)
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
         painter.setWindow(stereogramPrint.rect());
         painter.drawImage(0, 0, stereogramPrint);
-#ifdef IFA_MODE
         const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
         const QString stereogramFilename = QString("%1.png").arg(++mFileSequenceNumber);
         const bool success = stereogramFile.save(stereogramFilename);
@@ -312,7 +311,6 @@ void MainWindow::printStereogram(void)
             qDebug() << "Mail versendet.";
         }
 #endif // IFA_SEND_MAIL
-#endif // IFA_MODE
     }
 }
 
