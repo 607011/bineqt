@@ -18,14 +18,12 @@
 #include <omp.h>
 #endif
 
-#define IFA_MODE 1
-
 const QString MainWindow::Company = "ct.de";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.1";
+const QString MainWindow::AppVersion = "0.9.2";
 #else
-const QString MainWindow::AppVersion = "0.9.1 [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.2 [DEBUG]";
 #endif
 
 
@@ -267,22 +265,13 @@ void MainWindow::printStereogram(void)
     QPrintDialog printDialog(&printer, this);
     if (printDialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
-        QRect rect = painter.viewport();
         const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
+        QRect rect = painter.viewport();
         QSize size = stereogramPrint.size();
         size.scale(rect.size(), Qt::KeepAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
         painter.setWindow(stereogramPrint.rect());
         painter.drawImage(0, 0, stereogramPrint);
-#ifdef IFA_MODE
-        const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
-        const QString stereogramFilename = QString("%1.png").arg(++mFileSequenceNumber);
-        const bool success = stereogramFile.save(stereogramFilename);
-        if (success)
-            statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
-        else
-            statusBar()->showMessage(tr("Beim Speichern des Bildes '%1' ist etwas schiefgegangen.").arg(stereogramFilename), 20000);
-#endif
     }
 }
 
