@@ -12,6 +12,12 @@
 #include "stereogramwidget.h"
 #include "nuithread.h"
 
+#define IFA_MODE
+
+#ifdef IFA_MODE
+// #define IFA_SEND_MAIL
+#endif
+
 namespace Ui {
     class MainWindow;
 }
@@ -54,18 +60,23 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
     DepthImageWidget* mDepthWidget;
     StereogramWidget* mStereogramWidget;
-
     NUIThread mNUIThread;
-
     QString mTextureFileName;
     QImage mTexture;
     bool mDepthFrameFrozen;
     QSize mSavedStereogramSize;
 
+#ifdef IFA_MODE
     int mFileSequenceNumber;
+#ifdef IFA_SEND_MAIL
+    QString mSmtpServer;
+    quint16 mSmtpPort;
+    QString mSmtpUser;
+    QString mSmtpPass;
+#endif // IFA_SEND_MAIL
+#endif // IFA_MODE
 };
 
 #endif // __MAINWINDOW_H_

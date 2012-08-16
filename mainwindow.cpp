@@ -8,17 +8,20 @@
 #include <QMessageBox>
 #include <QtCore/QtDebug>
 #include <QPainter>
+#include <QEventLoop>
 
 #include "nui.h"
 #include "mainwindow.h"
 #include "stereogramsaveform.h"
 #include "ui_mainwindow.h"
 
+#ifdef IFA_SEND_MAIL
+#include "smtp.h"
+#endif // IFA_SEND_MAIL
+
 #ifdef _OPENMP
 #include <omp.h>
 #endif
-
-#define IFA_MODE 1
 
 const QString MainWindow::Company = "ct.de";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
@@ -107,6 +110,20 @@ MainWindow::MainWindow(QWidget* parent)
     ui->farSlider->setMaximum(NUI_IMAGE_DEPTH_MAXIMUM);
 
     restoreAppSettings();
+
+#ifdef IFA_SEND_MAIL
+    QSettings settings("ifa.ini", QSettings::IniFormat);
+    if (settings.status() == QSettings::NoError) {
+        mSmtpServer = settings.value("SMTP/server").toString();
+        mSmtpPort = (quint16)settings.value("SMTP/port").toInt();
+        mSmtpUser = settings.value("SMTP/user").toString();
+        mSmtpPass = settings.value("SMTP/password").toString();
+        qDebug() << mSmtpServer << mSmtpPort << mSmtpUser << mSmtpPass;
+    }
+    else {
+        QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
+    }
+#endif
 }
 
 
@@ -214,8 +231,8 @@ void MainWindow::restoreAppSettings(void)
 void MainWindow::loadTexture(const QString& filename)
 {
     if (filename != "") {
-        const bool rc = mTexture.load(filename);
-        if (rc) {
+        bool success = mTexture.load(filename);
+        if (success) {
             mDepthWidget->resetSelection();
             mStereogramWidget->setTexture(mTexture);
             statusBar()->showMessage(tr("Textur '%1' geladen.").arg(mTextureFileName), 3000);
@@ -237,8 +254,8 @@ void MainWindow::openTexture(void)
 void MainWindow::saveDepthImage(void)
 {
     const QString& depthImageFilename = QFileDialog::getSaveFileName(this, tr("Tiefenbild speichern"));
-    const bool rc = mDepthWidget->depthImage().save(depthImageFilename);
-    if (rc) {
+    bool success = mDepthWidget->depthImage().save(depthImageFilename);
+    if (success) {
         statusBar()->showMessage(tr("Tiefenbild unter '%1' gespeichert.").arg(depthImageFilename), 3000);
     }
     else {
@@ -268,9 +285,10 @@ void MainWindow::printStereogram(void)
     if (printDialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
         QRect rect = painter.viewport();
+        qDebug() << "painter.viewport() = " << painter.viewport();
         const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
         QSize size = stereogramPrint.size();
-        size.scale(rect.size(), Qt::KeepAspectRatio);
+        size.scale(rect.size(), Qt::IgnoreAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
         painter.setWindow(stereogramPrint.rect());
         painter.drawImage(0, 0, stereogramPrint);
@@ -281,8 +299,20 @@ void MainWindow::printStereogram(void)
         if (success)
             statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
         else
-            statusBar()->showMessage(tr("Beim Speichern des Bildes '%1' ist etwas schiefgegangen.").arg(stereogramFilename), 20000);
-#endif
+            statusBar()->showMessage(tr("Uiuiuiiii, beim Speichern des Bildes '%1' ist irgendwas schiefgegangen =:-/").arg(stereogramFilename), 20000);
+#ifdef IFA_SEND_MAIL
+        if (!mSmtpServer.isEmpty() && !mSmtpUser.isEmpty() && !mSmtpPass.isEmpty()) {
+            // We create an event loop and connect to it to prevent the main thread from being crippled when sending large mails or connecting over a slow connection
+            QEventLoop loop;
+            QStringList to;
+            to << "oliver.lau@gmail.com";
+            Smtp* smtp = new Smtp(mSmtpServer, mSmtpPort, mSmtpUser, mSmtpPass, "ola@ct.de", to, "Ihr Autostereogramm", "Ihr Text hier!");
+            QObject::connect(smtp, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+            qDebug() << "Mail versendet.";
+        }
+#endif // IFA_SEND_MAIL
+#endif // IFA_MODE
     }
 }
 

@@ -1,7 +1,7 @@
 # Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 # All rights reserved.
 
-QT += core gui opengl multimedia
+QT += core gui opengl multimedia network qt3support
 
 TARGET = Bineqt
 TEMPLATE = app
@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     depthimagewidget.cpp \
     stereogramwidget.cpp \
     stereogramsaveform.cpp \
-    depthdata.cpp
+    depthdata.cpp \
+    smtp.cpp
 
 HEADERS += mainwindow.h \
     nuithread.h \
@@ -32,7 +33,8 @@ HEADERS += mainwindow.h \
     depthimagewidget.h \
     stereogramwidget.h \
     stereogramsaveform.h \
-    depthdata.h
+    depthdata.h \
+    smtp.h
 
 FORMS += mainwindow.ui \
     stereogramsaveform.ui
@@ -46,6 +48,10 @@ OTHER_FILES += \
     Bineqt.rc
 
 RC_FILE = Bineqt.rc
+
+
+
+
 
 
 
