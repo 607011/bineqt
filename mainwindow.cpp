@@ -212,8 +212,8 @@ void MainWindow::restoreAppSettings(void)
 void MainWindow::loadTexture(const QString& filename)
 {
     if (filename != "") {
-        const bool rc = mTexture.load(filename);
-        if (rc) {
+        bool success = mTexture.load(filename);
+        if (success) {
             mDepthWidget->resetSelection();
             mStereogramWidget->setTexture(mTexture);
             statusBar()->showMessage(tr("Textur '%1' geladen.").arg(mTextureFileName), 3000);
@@ -235,8 +235,8 @@ void MainWindow::openTexture(void)
 void MainWindow::saveDepthImage(void)
 {
     const QString& depthImageFilename = QFileDialog::getSaveFileName(this, tr("Tiefenbild speichern"));
-    const bool rc = mDepthWidget->depthImage().save(depthImageFilename);
-    if (rc) {
+    bool success = mDepthWidget->depthImage().save(depthImageFilename);
+    if (success) {
         statusBar()->showMessage(tr("Tiefenbild unter '%1' gespeichert.").arg(depthImageFilename), 3000);
     }
     else {

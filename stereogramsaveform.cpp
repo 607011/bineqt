@@ -33,8 +33,8 @@ void StereogramSaveForm::saveStereogram(void) {
         return;
     mChosenImageSize = QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value());
     const QImage& stereogram = mStereogramWidget->stereogram(mChosenImageSize);
-    const bool rc = stereogram.save(stereogramFilename);
-    if (rc) {
+    bool success = stereogram.save(stereogramFilename);
+    if (success) {
         QMessageBox::information(this, tr("Stereogramm gespeichert"), tr("Stereogramm wurde erfolgreich unter dem Namen '%1' gespeichert.").arg(stereogramFilename));
     }
     else {
