@@ -18,7 +18,7 @@
 #include <omp.h>
 #endif
 
-const QString MainWindow::Company = "ct.de";
+const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
 const QString MainWindow::AppVersion = "0.9.2";
@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , mDepthFrameFrozen(false)
-    , mFileSequenceNumber(0)
 {
     QCoreApplication::setOrganizationName(MainWindow::Company);
     QCoreApplication::setOrganizationDomain(MainWindow::Company);
@@ -180,7 +179,6 @@ void MainWindow::saveAppSettings(void)
     settings.setValue("MainWindow/fitFrame", ui->fitFrameCheckBox->isChecked());
     settings.setValue("MainWindow/patternMode", ui->modeComboBox->currentIndex());
     settings.setValue("MainWindow/stereogramSize", ui->stereogramSizeComboBox->currentIndex());
-    settings.setValue("MainWindow/fileSequenceNumber", mFileSequenceNumber);
     settings.setValue("SavedStereogram/size", mSavedStereogramSize);
 }
 
@@ -204,7 +202,6 @@ void MainWindow::restoreAppSettings(void)
     ui->modeComboBox->setCurrentIndex(settings.value("MainWindow/patternMode").toInt());
     ui->stereogramSizeComboBox->setCurrentIndex(settings.value("MainWindow/stereogramSize").toInt());
     mSavedStereogramSize = settings.value("SavedStereogram/size", QSize(640, 480)).toSize();
-    mFileSequenceNumber = settings.value("MainWindow/fileSequenceNumber", 0).toInt();
     placeStereogramWidget();
 }
 
