@@ -23,12 +23,12 @@
 #include <omp.h>
 #endif
 
-const QString MainWindow::Company = "ct.de";
+const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.2-IFA";
+const QString MainWindow::AppVersion = "0.9.3-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.2-IFA [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.3-IFA [DEBUG]";
 #endif
 
 
@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , mDepthFrameFrozen(false)
-    , mFileSequenceNumber(0)
+    , mFileSequenceNumber(-1)
 {
     QCoreApplication::setOrganizationName(MainWindow::Company);
     QCoreApplication::setOrganizationDomain(MainWindow::Company);
@@ -103,12 +103,14 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(ui->fitFrameCheckBox, SIGNAL(toggled(bool)), SLOT(fitFrameIntoDepthFrame(bool)));
     QObject::connect(ui->modeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(modeChanged(int)));
     QObject::connect(ui->stereogramSizeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(stereogramSizeChanged(int)));
+    QObject::connect(ui->actionResetFileSequenceCounter, SIGNAL(triggered()), SLOT(resetFileSequenceCounter()));
 
     ui->nearSlider->setMinimum(NUI_IMAGE_DEPTH_MINIMUM);
     ui->nearSlider->setMaximum(NUI_IMAGE_DEPTH_MAXIMUM);
     ui->farSlider->setMinimum(NUI_IMAGE_DEPTH_MINIMUM);
     ui->farSlider->setMaximum(NUI_IMAGE_DEPTH_MAXIMUM);
 
+    incrementFileSequenceCounter();
     restoreAppSettings();
 
 #ifdef IFA_SEND_MAIL
@@ -223,7 +225,8 @@ void MainWindow::restoreAppSettings(void)
     ui->modeComboBox->setCurrentIndex(settings.value("MainWindow/patternMode").toInt());
     ui->stereogramSizeComboBox->setCurrentIndex(settings.value("MainWindow/stereogramSize").toInt());
     mSavedStereogramSize = settings.value("SavedStereogram/size", QSize(640, 480)).toSize();
-    mFileSequenceNumber = settings.value("MainWindow/fileSequenceNumber", 0).toInt();
+    mFileSequenceNumber = settings.value("MainWindow/fileSequenceNumber", -1).toInt();
+    incrementFileSequenceCounter();
     placeStereogramWidget();
 }
 
@@ -293,7 +296,8 @@ void MainWindow::printStereogram(void)
         painter.setWindow(stereogramPrint.rect());
         painter.drawImage(0, 0, stereogramPrint);
         const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
-        const QString stereogramFilename = QString("%1.png").arg(++mFileSequenceNumber);
+        const QString stereogramFilename = QString("%1.png").arg(mFileSequenceNumber);
+        incrementFileSequenceCounter();
         const bool success = stereogramFile.save(stereogramFilename);
         if (success)
             statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
@@ -354,4 +358,22 @@ void MainWindow::stereogramSizeChanged(int)
     const int columns = DepthImageWidget::WIDTH * lines / DepthImageWidget::HEIGHT;
     const QSize& requestedSize = QSize(columns, lines);
     mStereogramWidget->setRequestedStereogramSize(requestedSize);
+}
+
+
+void MainWindow::incrementFileSequenceCounter(void)
+{
+    ++mFileSequenceNumber;
+    ui->actionResetFileSequenceCounter->setText(tr("Zähler für automatischen Speichern zurücksetzen (aktuell: %1)").arg(mFileSequenceNumber));
+}
+
+
+void MainWindow::resetFileSequenceCounter(void)
+{
+    const int rc = QMessageBox::question(this, tr("Dateizähler zurücksetzen?"), tr("Zähler für automatisches Speichern des Stereogramms beim Drucken wirklich zurücksetzen?"), QMessageBox::Yes | QMessageBox::No);
+    if (rc == QMessageBox::Yes) {
+        mFileSequenceNumber = -1;
+        incrementFileSequenceCounter();
+        statusBar()->showMessage(tr("Der Zähler für automatisches Speichern wurde auf 0 zurückgesetzt."), 5000);
+    }
 }

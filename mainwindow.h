@@ -37,6 +37,7 @@ private: // methods
     void saveAppSettings(void);
     void restoreAppSettings(void);
     void loadTexture(const QString&);
+    void incrementFileSequenceCounter(void);
 
 private slots:
     void openTexture(void);
@@ -53,6 +54,7 @@ private slots:
     void fitFrameIntoDepthFrame(bool);
     void modeChanged(int);
     void stereogramSizeChanged(int);
+    void resetFileSequenceCounter(void);
 
 private:
     Ui::MainWindow *ui;

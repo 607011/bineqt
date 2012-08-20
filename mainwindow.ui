@@ -370,15 +370,16 @@
     </property>
     <addaction name="actionDetachStereogram"/>
    </widget>
-   <widget class="QMenu" name="menuPrint">
+   <widget class="QMenu" name="menuExtras">
     <property name="title">
-     <string>Drucken</string>
+     <string>Extras</string>
     </property>
     <addaction name="actionPrintAutostereogram"/>
+    <addaction name="actionResetFileSequenceCounter"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuWindow"/>
-   <addaction name="menuPrint"/>
+   <addaction name="menuExtras"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -445,10 +446,15 @@
   </action>
   <action name="actionPrintAutostereogram">
    <property name="text">
-    <string>Autostereogram (Strg+P)</string>
+    <string>Autostereogram drucken (Strg+P)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionResetFileSequenceCounter">
+   <property name="text">
+    <string>Zähler für automatischen Speichern zurücksetzen</string>
    </property>
   </action>
  </widget>
