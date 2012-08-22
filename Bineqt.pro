@@ -25,7 +25,19 @@ SOURCES += main.cpp\
     stereogramwidget.cpp \
     stereogramsaveform.cpp \
     depthdata.cpp \
-    smtp.cpp
+    smtp/src/smtpclient.cpp \
+    smtp/src/quotedprintable.cpp \
+    smtp/src/mimetext.cpp \
+    smtp/src/mimepart.cpp \
+    smtp/src/mimemultipart.cpp \
+    smtp/src/mimemessage.cpp \
+    smtp/src/mimeinlinefile.cpp \
+    smtp/src/mimehtml.cpp \
+    smtp/src/mimefile.cpp \
+    smtp/src/mimecontentformatter.cpp \
+    smtp/src/mimeattachment.cpp \
+    smtp/src/emailaddress.cpp \
+    mailaddressdialog.cpp
 
 HEADERS += mainwindow.h \
     nuithread.h \
@@ -34,10 +46,24 @@ HEADERS += mainwindow.h \
     stereogramwidget.h \
     stereogramsaveform.h \
     depthdata.h \
-    smtp.h
+    smtp/src/SmtpMime \
+    smtp/src/smtpclient.h \
+    smtp/src/quotedprintable.h \
+    smtp/src/mimetext.h \
+    smtp/src/mimepart.h \
+    smtp/src/mimemultipart.h \
+    smtp/src/mimemessage.h \
+    smtp/src/mimeinlinefile.h \
+    smtp/src/mimehtml.h \
+    smtp/src/mimefile.h \
+    smtp/src/mimecontentformatter.h \
+    smtp/src/mimeattachment.h \
+    smtp/src/emailaddress.h \
+    mailaddressdialog.h
 
 FORMS += mainwindow.ui \
-    stereogramsaveform.ui
+    stereogramsaveform.ui \
+    mailaddressdialog.ui
 
 RESOURCES += \
     Textures.qrc \
@@ -45,9 +71,22 @@ RESOURCES += \
 
 OTHER_FILES += \
     TODO.txt \
-    Bineqt.rc
+    Bineqt.rc \
+    ifa.ini
 
 RC_FILE = Bineqt.rc
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
