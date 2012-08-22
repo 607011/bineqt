@@ -16,9 +16,7 @@
 #include "stereogramsaveform.h"
 #include "ui_mainwindow.h"
 
-#ifdef IFA_SEND_MAIL
 #include "smtp/src/SmtpMime"
-#endif // IFA_SEND_MAIL
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -114,7 +112,6 @@ MainWindow::MainWindow(QWidget* parent)
     incrementFileSequenceCounter();
     restoreAppSettings();
 
-#ifdef IFA_SEND_MAIL
     QSettings settings("ifa.ini", QSettings::IniFormat);
     if (settings.status() == QSettings::NoError) {
         mSmtpServer = settings.value("SMTP/server").toString();
@@ -127,7 +124,6 @@ MainWindow::MainWindow(QWidget* parent)
     else {
         QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
     }
-#endif
 }
 
 
@@ -305,7 +301,7 @@ void MainWindow::printStereogram(void)
             statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename));
         else
             statusBar()->showMessage(tr("Uiuiuiiii, beim Speichern des Bildes '%1' ist irgendwas schiefgegangen =:-/").arg(stereogramFilename));
-#ifdef IFA_SEND_MAIL
+
         MailAddressDialog mailDialog(this);
         mailDialog.setFileName(stereogramFilename);
         int rc = mailDialog.exec();
@@ -317,7 +313,7 @@ void MainWindow::printStereogram(void)
             message.setSubject("Ihr Autostereogramm vom c't-Stand auf der IFA 2012");
             MimeText body;
             body.setText("Guten Tag!\n\n"
-                         "Vielen Dank, dass Sie unseren Stand auf der IFA 2012 besucht haben. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\n\n"
+                         "Vielen Dank für Ihren Besuch auf unseren IFA-Stand. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\n\n"
                          "Freundliche Grüße,\n"
                          "Ihre c't-Redaktion\n\n"
                          "Bitte beachten Sie, dass Sie auf diese Mail nicht antworten können.\n\n"
@@ -334,18 +330,14 @@ void MainWindow::printStereogram(void)
             smtp.setUser(mSmtpUser);
             smtp.setPassword(mSmtpPass);
             success = smtp.connectToHost();
-            qDebug() << "smtp.connectToHost() OK?" << success;
             success &= smtp.login();
-            qDebug() << "smtp.login() OK?" << success;
             success &= smtp.sendMail(message);
-            qDebug() << "smtp.sendMail() OK?" << success;
             smtp.quit();
             if (success)
                 statusBar()->showMessage(tr("Mail wurde an '%1' versendet.").arg(recipient));
             else
                 statusBar()->showMessage(tr("Uiuiuiiii, beim Versenden der Mail an %1 ist irgendwas schiefgegangen =:-/").arg(recipient));
         }
-#endif // IFA_SEND_MAIL
     }
 }
 
