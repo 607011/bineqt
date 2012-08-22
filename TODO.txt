@@ -1,2 +1,0 @@
-[x] Stereogramme beliebiger Größe beim Speichern erzeugen (2012-06-06)
-[x] Stereogramme beliebiger Größe in Echtzeit im abgelösten StereogramWidget anzeigen

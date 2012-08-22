@@ -25,9 +25,9 @@
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.3-IFA";
+const QString MainWindow::AppVersion = "0.9.4-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.3-IFA [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.4-IFA [DEBUG]";
 #endif
 
 
@@ -119,7 +119,6 @@ MainWindow::MainWindow(QWidget* parent)
         mSmtpUser = settings.value("SMTP/user").toString();
         mSmtpPass = settings.value("SMTP/password").toString();
         mSmtpSender = settings.value("SMTP/sender").toString();
-        qDebug() << mSmtpServer << mSmtpPort << mSmtpUser << mSmtpPass << mSmtpSender;
     }
     else {
         QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
