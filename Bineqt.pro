@@ -70,11 +70,11 @@ RESOURCES += \
     Images.qrc
 
 OTHER_FILES += \
-    TODO.txt \
     Bineqt.rc \
     ifa.ini
 
 RC_FILE = Bineqt.rc
+
 
 
 

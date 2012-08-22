@@ -56,7 +56,7 @@ private slots:
     void resetFileSequenceCounter(void);
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
     DepthImageWidget* mDepthWidget;
     StereogramWidget* mStereogramWidget;
     NUIThread mNUIThread;
