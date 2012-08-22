@@ -11,8 +11,9 @@
 #include "depthimagewidget.h"
 #include "stereogramwidget.h"
 #include "nuithread.h"
+#include "mailaddressdialog.h"
 
-// #define IFA_SEND_MAIL
+#define IFA_SEND_MAIL 1
 
 namespace Ui {
     class MainWindow;
@@ -72,6 +73,7 @@ private:
     quint16 mSmtpPort;
     QString mSmtpUser;
     QString mSmtpPass;
+    QString mSmtpSender;
 #endif // IFA_SEND_MAIL
 };
 

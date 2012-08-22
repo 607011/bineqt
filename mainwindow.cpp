@@ -9,6 +9,7 @@
 #include <QtCore/QtDebug>
 #include <QPainter>
 #include <QEventLoop>
+#include <QDesktopServices>
 
 #include "nui.h"
 #include "mainwindow.h"
@@ -16,7 +17,7 @@
 #include "ui_mainwindow.h"
 
 #ifdef IFA_SEND_MAIL
-#include "smtp.h"
+#include "smtp/src/SmtpMime"
 #endif // IFA_SEND_MAIL
 
 #ifdef _OPENMP
@@ -120,7 +121,8 @@ MainWindow::MainWindow(QWidget* parent)
         mSmtpPort = (quint16)settings.value("SMTP/port").toInt();
         mSmtpUser = settings.value("SMTP/user").toString();
         mSmtpPass = settings.value("SMTP/password").toString();
-        qDebug() << mSmtpServer << mSmtpPort << mSmtpUser << mSmtpPass;
+        mSmtpSender = settings.value("SMTP/sender").toString();
+        qDebug() << mSmtpServer << mSmtpPort << mSmtpUser << mSmtpPass << mSmtpSender;
     }
     else {
         QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
@@ -283,12 +285,12 @@ void MainWindow::saveStereogram(void)
 
 void MainWindow::printStereogram(void)
 {
+    bool success;
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog printDialog(&printer, this);
     if (printDialog.exec() == QDialog::Accepted) {
         QPainter painter(&printer);
         QRect rect = painter.viewport();
-        qDebug() << "painter.viewport() = " << painter.viewport();
         const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
         QSize size = stereogramPrint.size();
         size.scale(rect.size(), Qt::IgnoreAspectRatio);
@@ -298,21 +300,45 @@ void MainWindow::printStereogram(void)
         const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
         const QString stereogramFilename = QString("%1.png").arg(mFileSequenceNumber);
         incrementFileSequenceCounter();
-        const bool success = stereogramFile.save(stereogramFilename);
+        success = stereogramFile.save(stereogramFilename);
         if (success)
             statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
         else
             statusBar()->showMessage(tr("Uiuiuiiii, beim Speichern des Bildes '%1' ist irgendwas schiefgegangen =:-/").arg(stereogramFilename), 20000);
 #ifdef IFA_SEND_MAIL
-        if (!mSmtpServer.isEmpty() && !mSmtpUser.isEmpty() && !mSmtpPass.isEmpty()) {
-            // We create an event loop and connect to it to prevent the main thread from being crippled when sending large mails or connecting over a slow connection
-            QEventLoop loop;
-            QStringList to;
-            to << "oliver.lau@gmail.com";
-            Smtp* smtp = new Smtp(mSmtpServer, mSmtpPort, mSmtpUser, mSmtpPass, "ola@ct.de", to, "Ihr Autostereogramm", "Ihr Text hier!");
-            QObject::connect(smtp, SIGNAL(finished()), &loop, SLOT(quit()));
-            loop.exec();
-            qDebug() << "Mail versendet.";
+        MailAddressDialog mailDialog(this);
+        int rc = mailDialog.exec();
+        if (rc == QDialog::Accepted) {
+            QString recipient = mailDialog.getAddress();
+            MimeMessage message;
+            message.setSender(new EmailAddress(mSmtpSender));
+            message.addRecipient(new EmailAddress(recipient));
+            message.setSubject("Ihr Autostereogramm vom c't-Stand auf der IFA 2012");
+            MimeText body;
+            body.setText("Guten Tag!\n\n"
+                         "Vielen Dank, dass Sie unseren Stand auf der IFA 2012 besucht haben. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\n\n"
+                         "Freundliche Grüße,\n"
+                         "Ihre c't-Redaktion\n\n"
+                         "Bitte beachten Sie, dass Sie auf diese Mail nicht antworten können.\n\n"
+                         "-- \n"
+                         "c't - Magazin fuer Computertechnik, http://ct.de\n"
+                         "Karl-Wiechert-Allee 10, 30625 Hannover, Germany\n"
+                         "fon +49-511-5352-300, fax +49-511-5352-417\n\n"
+                         "/* Pflichtangaben gemäß §37a HGB: Heise Zeitschriften Verlag GmbH & Co. KG, Registergericht: Amtsgericht Hannover, HRA 26709; Persönlich haftende Gesellschafterin: Heise Zeitschriften Verlag Geschäftsführung GmbH, Registergericht: Amtsgericht Hannover, HRB 60405, Geschäftsführer: Ansgar Heise, Dr. Alfons Schräder */");
+            message.addPart(&body);
+            MimeAttachment attachment(new QFile(stereogramFilename));
+            attachment.setContentType("image/png");
+            message.addPart(&attachment);
+            SmtpClient smtp(mSmtpServer, mSmtpPort, SmtpClient::TlsConnection);
+            smtp.setUser(mSmtpUser);
+            smtp.setPassword(mSmtpPass);
+            success = smtp.connectToHost();
+            qDebug() << "smtp.connectToHost() OK?" << success;
+            success = smtp.login();
+            qDebug() << "smtp.login() OK?" << success;
+            success = smtp.sendMail(message);
+            qDebug() << "smtp.sendMail() OK?" << success;
+            smtp.quit();
         }
 #endif // IFA_SEND_MAIL
     }
