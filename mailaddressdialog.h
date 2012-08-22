@@ -19,6 +19,7 @@ public:
     ~MailAddressDialog();
 
     QString getAddress(void);
+    void setFileName(const QString& hint);
 
 private:
     Ui::MailAddressDialog *ui;

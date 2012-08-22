@@ -302,11 +302,12 @@ void MainWindow::printStereogram(void)
         incrementFileSequenceCounter();
         success = stereogramFile.save(stereogramFilename);
         if (success)
-            statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename), 20000);
+            statusBar()->showMessage(tr("Bild '%1' wurde gespeichert und wird nun gedruckt.").arg(stereogramFilename));
         else
-            statusBar()->showMessage(tr("Uiuiuiiii, beim Speichern des Bildes '%1' ist irgendwas schiefgegangen =:-/").arg(stereogramFilename), 20000);
+            statusBar()->showMessage(tr("Uiuiuiiii, beim Speichern des Bildes '%1' ist irgendwas schiefgegangen =:-/").arg(stereogramFilename));
 #ifdef IFA_SEND_MAIL
         MailAddressDialog mailDialog(this);
+        mailDialog.setFileName(stereogramFilename);
         int rc = mailDialog.exec();
         if (rc == QDialog::Accepted) {
             QString recipient = mailDialog.getAddress();
@@ -334,11 +335,15 @@ void MainWindow::printStereogram(void)
             smtp.setPassword(mSmtpPass);
             success = smtp.connectToHost();
             qDebug() << "smtp.connectToHost() OK?" << success;
-            success = smtp.login();
+            success &= smtp.login();
             qDebug() << "smtp.login() OK?" << success;
-            success = smtp.sendMail(message);
+            success &= smtp.sendMail(message);
             qDebug() << "smtp.sendMail() OK?" << success;
             smtp.quit();
+            if (success)
+                statusBar()->showMessage(tr("Mail wurde an '%1' versendet.").arg(recipient));
+            else
+                statusBar()->showMessage(tr("Uiuiuiiii, beim Versenden der Mail an %1 ist irgendwas schiefgegangen =:-/").arg(recipient));
         }
 #endif // IFA_SEND_MAIL
     }

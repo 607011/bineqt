@@ -22,3 +22,9 @@ QString MailAddressDialog::getAddress(void)
 {
     return ui->mailLineEdit->text();
 }
+
+
+void MailAddressDialog::setFileName(const QString& hint)
+{
+    setWindowTitle(tr("PNG-Datei '%1' versenden").arg(hint));
+}
