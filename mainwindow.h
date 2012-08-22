@@ -13,8 +13,6 @@
 #include "nuithread.h"
 #include "mailaddressdialog.h"
 
-#define IFA_SEND_MAIL 1
-
 namespace Ui {
     class MainWindow;
 }
@@ -68,13 +66,12 @@ private:
     QSize mSavedStereogramSize;
 
     int mFileSequenceNumber;
-#ifdef IFA_SEND_MAIL
+
     QString mSmtpServer;
     quint16 mSmtpPort;
     QString mSmtpUser;
     QString mSmtpPass;
     QString mSmtpSender;
-#endif // IFA_SEND_MAIL
 };
 
 #endif // __MAINWINDOW_H_
