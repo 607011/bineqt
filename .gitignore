@@ -1,0 +1,7 @@
+*.orig
+SIRD/*
+Texturen/DamaskWallpaper*
+deploy/*
+.hg
+.hgignore
+ifa.ini
