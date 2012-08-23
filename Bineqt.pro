@@ -42,10 +42,10 @@ RESOURCES += \
     Images.qrc
 
 OTHER_FILES += \
-    TODO.txt \
     Bineqt.rc
 
 RC_FILE = Bineqt.rc
+
 
 
 
