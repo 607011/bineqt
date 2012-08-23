@@ -21,9 +21,9 @@
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.2";
+const QString MainWindow::AppVersion = "0.9.2.1";
 #else
-const QString MainWindow::AppVersion = "0.9.2 [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.2.1 [DEBUG]";
 #endif
 
 
@@ -118,6 +118,19 @@ void MainWindow::closeEvent(QCloseEvent* e)
     saveAppSettings();
     e->accept();
 }
+
+
+void MainWindow::keyPressEvent(QKeyEvent* e)
+{
+    switch (e->key()) {
+    case Qt::Key_Space:
+        freezeToggled(mDepthFrameFrozen);
+        break;
+    default:
+        break;
+    }
+}
+
 
 
 void MainWindow::freezeToggled(bool running)

@@ -30,6 +30,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent*);
+    void keyPressEvent(QKeyEvent*);
 
 private: // methods
     void saveAppSettings(void);

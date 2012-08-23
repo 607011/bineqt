@@ -415,7 +415,7 @@
   </action>
   <action name="actionSaveDepthImageAs">
    <property name="text">
-    <string>Tiefenbild speichern als ... (Strg+S)</string>
+    <string>Tiefenbild speichern als ...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -423,7 +423,7 @@
   </action>
   <action name="actionSaveStereogramAs">
    <property name="text">
-    <string>Stereogramm speichern als ... (Umsch+Strg+S)</string>
+    <string>Stereogramm speichern als ...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -434,7 +434,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Stereogramm &amp;aushängen (Strg+A)</string>
+    <string>Stereogramm &amp;aushängen</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -445,7 +445,7 @@
   </action>
   <action name="actionPrintAutostereogram">
    <property name="text">
-    <string>Autostereogram (Strg+P)</string>
+    <string>Autostereogram</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
