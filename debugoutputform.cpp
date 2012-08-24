@@ -10,7 +10,6 @@ DebugOutputForm::DebugOutputForm(QWidget* parent)
 {
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint);
     ui->setupUi(this);
-    QObject::connect(ui->clearPushButton, SIGNAL(clicked()), ui->debugPlainTextEdit, SLOT(clear()));
 }
 
 

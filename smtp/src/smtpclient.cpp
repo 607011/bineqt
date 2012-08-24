@@ -27,8 +27,8 @@
 SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType) :
     name("localhost"),
     authMethod(AuthPlain),
-    connectionTimeout(30000),
-    responseTimeout(30000)
+    connectionTimeout(7500),
+    responseTimeout(7500)
 {
     setConnectionType(connectionType);
 
