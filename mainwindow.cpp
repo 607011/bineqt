@@ -16,8 +16,6 @@
 #include "stereogramsaveform.h"
 #include "ui_mainwindow.h"
 
-#include "smtp/src/SmtpMime"
-
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -25,9 +23,9 @@
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.4-IFA";
+const QString MainWindow::AppVersion = "0.9.4a-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.4-IFA [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.4a-IFA [DEBUG]";
 #endif
 
 
@@ -104,6 +102,8 @@ MainWindow::MainWindow(QWidget* parent)
     QObject::connect(ui->stereogramSizeComboBox, SIGNAL(currentIndexChanged(int)), SLOT(stereogramSizeChanged(int)));
     QObject::connect(ui->actionResetFileSequenceCounter, SIGNAL(triggered()), SLOT(resetFileSequenceCounter()));
 
+    QObject::connect(ui->actionDebugOutput, SIGNAL(toggled(bool)), SLOT(toggleDebugWidget(bool)));
+
     ui->nearSlider->setMinimum(NUI_IMAGE_DEPTH_MINIMUM);
     ui->nearSlider->setMaximum(NUI_IMAGE_DEPTH_MAXIMUM);
     ui->farSlider->setMinimum(NUI_IMAGE_DEPTH_MINIMUM);
@@ -123,6 +123,16 @@ MainWindow::MainWindow(QWidget* parent)
     else {
         QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
     }
+
+    mDebug.print("Einstellungen:");
+    mDebug.print(QString("  mSmtpServer: %1").arg(mSmtpServer));
+    mDebug.print(QString("  mSmtpPort: %1").arg(mSmtpPort));
+    mDebug.print(QString("  mSmtpUser: %1").arg("*******"));
+    mDebug.print(QString("  mSmtpPass: %1").arg("*******"));
+    mDebug.print(QString("  mSmtpSender: %1").arg(mSmtpSender));
+
+    if (ui->actionDebugOutput->isChecked())
+        mDebug.show();
 }
 
 
@@ -135,6 +145,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent* e)
 {
     saveAppSettings();
+    mDebug.close();
     e->accept();
 }
 
@@ -149,6 +160,15 @@ void MainWindow::freezeToggled(bool running)
     ui->actionFreeze->blockSignals(true);
     ui->actionFreeze->setChecked(mDepthFrameFrozen);
     ui->actionFreeze->blockSignals(false);
+}
+
+
+void MainWindow::toggleDebugWidget(bool checked)
+{
+    if (checked)
+        mDebug.show();
+    else
+        mDebug.hide();
 }
 
 
@@ -284,16 +304,22 @@ void MainWindow::printStereogram(void)
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog printDialog(&printer, this);
     if (printDialog.exec() == QDialog::Accepted) {
+#if 0
+        mDebug.print("\nAutostereogramm wird gedruckt ...");
+        const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
         QPainter painter(&printer);
         QRect rect = painter.viewport();
-        const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
         QSize size = stereogramPrint.size();
         size.scale(rect.size(), Qt::IgnoreAspectRatio);
         painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
         painter.setWindow(stereogramPrint.rect());
         painter.drawImage(0, 0, stereogramPrint);
+#else
+        mDebug.print("\n**** DRUCKFUNKTION IST VORÜBERGEHEND AUSGESCHALTET ****");
+#endif
         const QImage& stereogramFile = mStereogramWidget->stereogram(QSize(1440, 1080));
         const QString stereogramFilename = QString("%1.png").arg(mFileSequenceNumber);
+        mDebug.print(QString("\nAutostereogramm '%1' wird gespeichert ...").arg(stereogramFilename));
         incrementFileSequenceCounter();
         success = stereogramFile.save(stereogramFilename);
         if (success)
@@ -315,7 +341,7 @@ void MainWindow::printStereogram(void)
                          "Vielen Dank für Ihren Besuch auf unseren IFA-Stand. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\n\n"
                          "Freundliche Grüße,\n"
                          "Ihre c't-Redaktion\n\n"
-                         "Bitte beachten Sie, dass Sie auf diese Mail nicht antworten können.\n\n"
+                         "P.S.: Antworten auf diese Mail laufen ins Leere.\n\n"
                          "-- \n"
                          "c't - Magazin fuer Computertechnik, http://ct.de\n"
                          "Karl-Wiechert-Allee 10, 30625 Hannover, Germany\n"
@@ -325,18 +351,72 @@ void MainWindow::printStereogram(void)
             MimeAttachment attachment(new QFile(stereogramFilename));
             attachment.setContentType("image/png");
             message.addPart(&attachment);
+            mDebug.print(QString("\nE-Mail versenden an '%1' ...\n").arg(recipient));
             SmtpClient smtp(mSmtpServer, mSmtpPort, SmtpClient::TlsConnection);
-            smtp.setUser(mSmtpUser);
-            smtp.setPassword(mSmtpPass);
+            QObject::connect(&smtp, SIGNAL(smtpError(SmtpError)), SLOT(debugSmtpError(SmtpError)));
             success = smtp.connectToHost();
-            success &= smtp.login();
-            success &= smtp.sendMail(message);
+            mDebug.print(QString("  smtp.connectToHost(): %1").arg(success? "OK" : "ERROR"));
+            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
+            switch (smtp.getSocket()->state()) {
+            case QAbstractSocket::UnconnectedState:
+                mDebug.print("  State: Unconnected\n");
+                break;
+            case QAbstractSocket::HostLookupState:
+                mDebug.print("  State: Host Lookup\n");
+                break;
+            case QAbstractSocket::ConnectingState:
+                mDebug.print("  State: Connecting\n");
+                break;
+            case QAbstractSocket::ConnectedState:
+                mDebug.print("  State: Connected\n");
+                break;
+            case QAbstractSocket::BoundState:
+                mDebug.print("  State: Bound\n");
+                break;
+            case QAbstractSocket::ClosingState:
+                mDebug.print("  State: Closing\n");
+                break;
+            case QAbstractSocket::ListeningState:
+                mDebug.print("  State: Listening\n");
+                break;
+            }
+            success = smtp.login(mSmtpUser, mSmtpPass);
+            mDebug.print(QString("  smtp.login(): %1").arg(success? "OK" : "ERROR"));
+            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
+            success = smtp.sendMail(message);
+            mDebug.print(QString("  smtp.sendMail(): %1").arg(success? "OK" : "ERROR"));
+            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
             smtp.quit();
             if (success)
                 statusBar()->showMessage(tr("Mail wurde an '%1' versendet.").arg(recipient));
             else
                 statusBar()->showMessage(tr("Uiuiuiiii, beim Versenden der Mail an %1 ist irgendwas schiefgegangen =:-/").arg(recipient));
         }
+    }
+}
+
+
+void MainWindow::debugSmtpError(SmtpClient::SmtpError e)
+{
+    switch (e) {
+    case SmtpClient::ConnectionTimeoutError:
+        mDebug.print("ConnectionTimeoutError");
+        break;
+    case SmtpClient::ResponseTimeoutError:
+        mDebug.print("ResponseTimeoutError");
+        break;
+    case SmtpClient::AuthenticationFailedError:
+        mDebug.print("ResponseTimeoutError");
+        break;
+    case SmtpClient::ServerError:
+        mDebug.print("ServerError (4xx)");
+        break;
+    case SmtpClient::ClientError:
+        mDebug.print("ClientError (5xx)");
+        break;
+    default:
+        mDebug.print("Unknown SMTP Error");
+        break;
     }
 }
 

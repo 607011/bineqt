@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     smtp/src/mimecontentformatter.cpp \
     smtp/src/mimeattachment.cpp \
     smtp/src/emailaddress.cpp \
-    mailaddressdialog.cpp
+    mailaddressdialog.cpp \
+    debugoutputform.cpp
 
 HEADERS += mainwindow.h \
     nuithread.h \
@@ -59,11 +60,13 @@ HEADERS += mainwindow.h \
     smtp/src/mimecontentformatter.h \
     smtp/src/mimeattachment.h \
     smtp/src/emailaddress.h \
-    mailaddressdialog.h
+    mailaddressdialog.h \
+    debugoutputform.h
 
 FORMS += mainwindow.ui \
     stereogramsaveform.ui \
-    mailaddressdialog.ui
+    mailaddressdialog.ui \
+    debugoutputform.ui
 
 RESOURCES += \
     Textures.qrc \
@@ -74,6 +77,9 @@ OTHER_FILES += \
     ifa.ini
 
 RC_FILE = Bineqt.rc
+
+
+
 
 
 

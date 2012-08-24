@@ -12,6 +12,11 @@
 #include "stereogramwidget.h"
 #include "nuithread.h"
 #include "mailaddressdialog.h"
+#include "debugoutputform.h"
+
+#include "smtp/src/SmtpMime"
+
+
 
 namespace Ui {
     class MainWindow;
@@ -54,6 +59,8 @@ private slots:
     void modeChanged(int);
     void stereogramSizeChanged(int);
     void resetFileSequenceCounter(void);
+    void toggleDebugWidget(bool checked);
+    void debugSmtpError(SmtpClient::SmtpError);
 
 private:
     Ui::MainWindow* ui;
@@ -64,6 +71,7 @@ private:
     QImage mTexture;
     bool mDepthFrameFrozen;
     QSize mSavedStereogramSize;
+    DebugOutputForm mDebug;
 
     int mFileSequenceNumber;
 

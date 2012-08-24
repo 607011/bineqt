@@ -369,6 +369,7 @@
      <string>Fenster</string>
     </property>
     <addaction name="actionDetachStereogram"/>
+    <addaction name="actionDebugOutput"/>
    </widget>
    <widget class="QMenu" name="menuExtras">
     <property name="title">
@@ -378,8 +379,8 @@
     <addaction name="actionResetFileSequenceCounter"/>
    </widget>
    <addaction name="menu_File"/>
-   <addaction name="menuWindow"/>
    <addaction name="menuExtras"/>
+   <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -416,7 +417,7 @@
   </action>
   <action name="actionSaveDepthImageAs">
    <property name="text">
-    <string>Tiefenbild speichern als ... (Strg+S)</string>
+    <string>Tiefenbild speichern als ...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -424,7 +425,7 @@
   </action>
   <action name="actionSaveStereogramAs">
    <property name="text">
-    <string>Stereogramm speichern als ... (Umsch+Strg+S)</string>
+    <string>Stereogramm speichern als ...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -435,7 +436,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Stereogramm &amp;aushängen (Strg+A)</string>
+    <string>Stereogramm &amp;aushängen</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -446,7 +447,7 @@
   </action>
   <action name="actionPrintAutostereogram">
    <property name="text">
-    <string>Autostereogram drucken (Strg+P)</string>
+    <string>Autostereogram drucken</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
@@ -455,6 +456,17 @@
   <action name="actionResetFileSequenceCounter">
    <property name="text">
     <string>Zähler für automatischen Speichern zurücksetzen</string>
+   </property>
+  </action>
+  <action name="actionDebugOutput">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug-Konsole</string>
    </property>
   </action>
  </widget>

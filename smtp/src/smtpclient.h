@@ -92,6 +92,7 @@ public:
     const QString & getResponseText() const;
     int getResponseCode() const;
 
+
     QTcpSocket* getSocket();
 
 
