@@ -341,8 +341,6 @@
      </spacer>
     </item>
    </layout>
-   <zorder></zorder>
-   <zorder>horizontalSpacer</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

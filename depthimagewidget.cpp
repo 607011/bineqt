@@ -5,11 +5,9 @@
 #include <QPainter>
 #include <QTime>
 #include <QtCore/QtDebug>
+#include "globalsettings.h"
 #include "depthimagewidget.h"
 
-#ifndef _OPENMP
-#define _OPENMP
-#endif
 
 #ifdef _OPENMP
 #include <omp.h>

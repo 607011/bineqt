@@ -11,21 +11,19 @@
 #include <QEventLoop>
 #include <QDesktopServices>
 
+#include "globalsettings.h"
 #include "nui.h"
 #include "mainwindow.h"
 #include "stereogramsaveform.h"
 #include "ui_mainwindow.h"
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.4a-IFA";
+const QString MainWindow::AppVersion = "0.9.4b-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.4a-IFA [DEBUG]";
+const QString MainWindow::AppVersion = "0.9.4b-IFA [DEBUG]";
 #endif
 
 
@@ -41,7 +39,11 @@ MainWindow::MainWindow(QWidget* parent)
     QSettings::setDefaultFormat(QSettings::NativeFormat);
 
     ui->setupUi(this);
-    setWindowTitle(tr("%1 %2 %3").arg(MainWindow::AppName).arg(MainWindow::AppVersion).arg(_OPENMP >= 200203? "MP" : ""));
+#if _OPENMP >= 200203
+    setWindowTitle(tr("%1 %2 MP").arg(MainWindow::AppName).arg(MainWindow::AppVersion));
+#else
+    setWindowTitle(tr("%1 %2").arg(MainWindow::AppName).arg(MainWindow::AppVersion));
+#endif
 
     ui->modeComboBox->addItem(tr("Kacheln"), QVariant(StereogramWidget::TileTexture));
     ui->modeComboBox->addItem(tr("Aufspannen"), QVariant(StereogramWidget::StretchTexture));
@@ -220,6 +222,7 @@ void MainWindow::saveAppSettings(void)
     settings.setValue("MainWindow/stereogramSize", ui->stereogramSizeComboBox->currentIndex());
     settings.setValue("MainWindow/fileSequenceNumber", mFileSequenceNumber);
     settings.setValue("SavedStereogram/size", mSavedStereogramSize);
+    settings.setValue("DebugOutputWidget/geometry", mDebug.saveGeometry());
 }
 
 
@@ -245,6 +248,7 @@ void MainWindow::restoreAppSettings(void)
     mFileSequenceNumber = settings.value("MainWindow/fileSequenceNumber", -1).toInt();
     incrementFileSequenceCounter();
     placeStereogramWidget();
+    mDebug.restoreGeometry(settings.value("DebugOutputWidget/geometry").toByteArray());
 }
 
 

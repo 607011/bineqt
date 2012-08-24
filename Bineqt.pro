@@ -1,7 +1,7 @@
 # Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 # All rights reserved.
 
-QT += core gui opengl multimedia network qt3support
+QT += core gui network
 
 TARGET = Bineqt
 TEMPLATE = app
@@ -61,7 +61,8 @@ HEADERS += mainwindow.h \
     smtp/src/mimeattachment.h \
     smtp/src/emailaddress.h \
     mailaddressdialog.h \
-    debugoutputform.h
+    debugoutputform.h \
+    globalsettings.h
 
 FORMS += mainwindow.ui \
     stereogramsaveform.ui \
@@ -73,48 +74,6 @@ RESOURCES += \
     Images.qrc
 
 OTHER_FILES += \
-    Bineqt.rc \
-    ifa.ini
+    Bineqt.rc
 
 RC_FILE = Bineqt.rc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
