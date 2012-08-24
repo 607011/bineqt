@@ -8,8 +8,8 @@
 #include <QMessageBox>
 #include <QtCore/QtDebug>
 #include <QPainter>
-#include <QEventLoop>
 #include <QDesktopServices>
+#include <QUrl>
 
 #include "globalsettings.h"
 #include "nui.h"
@@ -21,9 +21,9 @@
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
 #ifdef QT_NO_DEBUG
-const QString MainWindow::AppVersion = "0.9.4b-IFA";
+const QString MainWindow::AppVersion = "1.0-IFA";
 #else
-const QString MainWindow::AppVersion = "0.9.4b-IFA [DEBUG]";
+const QString MainWindow::AppVersion = "1.0-IFA [DEBUG]";
 #endif
 
 
@@ -113,25 +113,6 @@ MainWindow::MainWindow(QWidget* parent)
 
     incrementFileSequenceCounter();
     restoreAppSettings();
-
-    QSettings settings("ifa.ini", QSettings::IniFormat);
-    if (settings.status() == QSettings::NoError) {
-        mSmtpServer = settings.value("SMTP/server").toString();
-        mSmtpPort = (quint16)settings.value("SMTP/port").toInt();
-        mSmtpUser = settings.value("SMTP/user").toString();
-        mSmtpPass = settings.value("SMTP/password").toString();
-        mSmtpSender = settings.value("SMTP/sender").toString();
-    }
-    else {
-        QMessageBox::critical(this, tr("Fehler beim Laden der SMTP-Einstellungen"), tr("SMTP konnte nicht konfiguriert werden, weil die Einstellungen nicht aus der Datei 'ifa.ini' geladen werden konnten."));
-    }
-
-    mDebug.print("Einstellungen:");
-    mDebug.print(QString("  mSmtpServer: %1").arg(mSmtpServer));
-    mDebug.print(QString("  mSmtpPort: %1").arg(mSmtpPort));
-    mDebug.print(QString("  mSmtpUser: %1").arg("*******"));
-    mDebug.print(QString("  mSmtpPass: %1").arg("*******"));
-    mDebug.print(QString("  mSmtpSender: %1").arg(mSmtpSender));
 
     if (ui->actionDebugOutput->isChecked())
         mDebug.show();
@@ -308,7 +289,7 @@ void MainWindow::printStereogram(void)
     QPrinter printer(QPrinter::HighResolution);
     QPrintDialog printDialog(&printer, this);
     if (printDialog.exec() == QDialog::Accepted) {
-#if 0
+#if 1
         mDebug.print("\nAutostereogramm wird gedruckt ...");
         const QImage& stereogramPrint = mStereogramWidget->stereogram(QSize(1754, 1240) /* DIN A4 @ 150 dpi */);
         QPainter painter(&printer);
@@ -336,91 +317,23 @@ void MainWindow::printStereogram(void)
         int rc = mailDialog.exec();
         if (rc == QDialog::Accepted) {
             QString recipient = mailDialog.getAddress();
-            MimeMessage message;
-            message.setSender(new EmailAddress(mSmtpSender));
-            message.addRecipient(new EmailAddress(recipient));
-            message.setSubject("Ihr Autostereogramm vom c't-Stand auf der IFA 2012");
-            MimeText body;
-            body.setText("Guten Tag!\n\n"
-                         "Vielen Dank für Ihren Besuch auf unseren IFA-Stand. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\n\n"
-                         "Freundliche Grüße,\n"
-                         "Ihre c't-Redaktion\n\n"
-                         "P.S.: Antworten auf diese Mail laufen ins Leere.\n\n"
-                         "-- \n"
-                         "c't - Magazin fuer Computertechnik, http://ct.de\n"
-                         "Karl-Wiechert-Allee 10, 30625 Hannover, Germany\n"
-                         "fon +49-511-5352-300, fax +49-511-5352-417\n\n"
-                         "/* Pflichtangaben gemäß §37a HGB: Heise Zeitschriften Verlag GmbH & Co. KG, Registergericht: Amtsgericht Hannover, HRA 26709; Persönlich haftende Gesellschafterin: Heise Zeitschriften Verlag Geschäftsführung GmbH, Registergericht: Amtsgericht Hannover, HRB 60405, Geschäftsführer: Ansgar Heise, Dr. Alfons Schräder */");
-            message.addPart(&body);
-            MimeAttachment attachment(new QFile(stereogramFilename));
-            attachment.setContentType("image/png");
-            message.addPart(&attachment);
-            mDebug.print(QString("\nE-Mail versenden an '%1' ...\n").arg(recipient));
-            SmtpClient smtp(mSmtpServer, mSmtpPort, SmtpClient::TlsConnection);
-            QObject::connect(&smtp, SIGNAL(smtpError(SmtpError)), SLOT(debugSmtpError(SmtpError)));
-            success = smtp.connectToHost();
-            mDebug.print(QString("  smtp.connectToHost(): %1").arg(success? "OK" : "ERROR"));
-            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
-            switch (smtp.getSocket()->state()) {
-            case QAbstractSocket::UnconnectedState:
-                mDebug.print("  State: Unconnected\n");
-                break;
-            case QAbstractSocket::HostLookupState:
-                mDebug.print("  State: Host Lookup\n");
-                break;
-            case QAbstractSocket::ConnectingState:
-                mDebug.print("  State: Connecting\n");
-                break;
-            case QAbstractSocket::ConnectedState:
-                mDebug.print("  State: Connected\n");
-                break;
-            case QAbstractSocket::BoundState:
-                mDebug.print("  State: Bound\n");
-                break;
-            case QAbstractSocket::ClosingState:
-                mDebug.print("  State: Closing\n");
-                break;
-            case QAbstractSocket::ListeningState:
-                mDebug.print("  State: Listening\n");
-                break;
-            }
-            success = smtp.login(mSmtpUser, mSmtpPass);
-            mDebug.print(QString("  smtp.login(): %1").arg(success? "OK" : "ERROR"));
-            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
-            success = smtp.sendMail(message);
-            mDebug.print(QString("  smtp.sendMail(): %1").arg(success? "OK" : "ERROR"));
-            mDebug.print(QString("  %1").arg(smtp.getResponseText()));
-            smtp.quit();
-            if (success)
-                statusBar()->showMessage(tr("Mail wurde an '%1' versendet.").arg(recipient));
-            else
-                statusBar()->showMessage(tr("Uiuiuiiii, beim Versenden der Mail an %1 ist irgendwas schiefgegangen =:-/").arg(recipient));
+            mDebug.print(QString("\nMailprogramm wird geöffnet (mailto:%1) ...").arg(recipient));
+            QString subject = "Ihr Autostereogramm vom c't-Stand auf der IFA 2012";
+            QString body = QString("Guten Tag!\r\n\r\n"
+                                   "Vielen Dank für Ihren Besuch auf unseren IFA-Stand. Mit dieser Mail erhalten Sie das Autostereogramm, das Sie angefertigt haben.\r\n\r\n"
+                                   "Freundliche Grüße,\r\n"
+                                   "Ihre c't-Redaktion\r\n\r\n"
+                                   "P.S.: Antworten auf diese Mail laufen ins Leere.\r\n\r\n"
+                                   "-- \r\n"
+                                   "c't - Magazin fuer Computertechnik, http://ct.de\r\n"
+                                   "Karl-Wiechert-Allee 10, 30625 Hannover, Germany\r\n"
+                                   "fon +49-511-5352-300, fax +49-511-5352-417\r\n\r\n"
+                                   "/* Pflichtangaben gemäß §37a HGB: Heise Zeitschriften Verlag GmbH & Co. KG, Registergericht: Amtsgericht Hannover, HRA 26709; Persönlich haftende Gesellschafterin: Heise Zeitschriften Verlag Geschäftsführung GmbH, Registergericht: Amtsgericht Hannover, HRB 60405, Geschäftsführer: Ansgar Heise, Dr. Alfons Schräder */"
+                                   "\r\n\r\n"
+                                   "<%1>").arg(stereogramFilename);
+            QUrl mailto = QUrl(QString("mailto:%1?subject=%2&body=%3").arg(recipient).arg(QUrl::toPercentEncoding(subject).constData()).arg(QUrl::toPercentEncoding(body).constData()));
+            QDesktopServices::openUrl(mailto);
         }
-    }
-}
-
-
-void MainWindow::debugSmtpError(SmtpClient::SmtpError e)
-{
-    switch (e) {
-    case SmtpClient::ConnectionTimeoutError:
-        mDebug.print("ConnectionTimeoutError");
-        break;
-    case SmtpClient::ResponseTimeoutError:
-        mDebug.print("ResponseTimeoutError");
-        break;
-    case SmtpClient::AuthenticationFailedError:
-        mDebug.print("ResponseTimeoutError");
-        break;
-    case SmtpClient::ServerError:
-        mDebug.print("ServerError (4xx)");
-        break;
-    case SmtpClient::ClientError:
-        mDebug.print("ClientError (5xx)");
-        break;
-    default:
-        mDebug.print("Unknown SMTP Error");
-        break;
     }
 }
 

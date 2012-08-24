@@ -14,9 +14,6 @@
 #include "mailaddressdialog.h"
 #include "debugoutputform.h"
 
-#include "smtp/src/SmtpMime"
-
-
 
 namespace Ui {
     class MainWindow;
@@ -60,7 +57,6 @@ private slots:
     void stereogramSizeChanged(int);
     void resetFileSequenceCounter(void);
     void toggleDebugWidget(bool checked);
-    void debugSmtpError(SmtpClient::SmtpError);
 
 private:
     Ui::MainWindow* ui;
@@ -74,12 +70,6 @@ private:
     DebugOutputForm mDebug;
 
     int mFileSequenceNumber;
-
-    QString mSmtpServer;
-    quint16 mSmtpPort;
-    QString mSmtpUser;
-    QString mSmtpPass;
-    QString mSmtpSender;
 };
 
 #endif // __MAINWINDOW_H_
