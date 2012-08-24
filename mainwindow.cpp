@@ -9,14 +9,12 @@
 #include <QtCore/QtDebug>
 #include <QPainter>
 
+#include "globalsettings.h"
 #include "nui.h"
 #include "mainwindow.h"
 #include "stereogramsaveform.h"
 #include "ui_mainwindow.h"
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 const QString MainWindow::Company = "c't";
 const QString MainWindow::AppName = QObject::tr("Bineqt");
@@ -38,7 +36,11 @@ MainWindow::MainWindow(QWidget* parent)
     QSettings::setDefaultFormat(QSettings::NativeFormat);
 
     ui->setupUi(this);
-    setWindowTitle(tr("%1 %2 %3").arg(MainWindow::AppName).arg(MainWindow::AppVersion).arg(_OPENMP >= 200203? "MP" : ""));
+#if _OPENMP >= 200203
+    setWindowTitle(tr("%1 %2 MP").arg(MainWindow::AppName).arg(MainWindow::AppVersion));
+#else
+    setWindowTitle(tr("%1 %2").arg(MainWindow::AppName).arg(MainWindow::AppVersion));
+#endif
 
     ui->modeComboBox->addItem(tr("Kacheln"), QVariant(StereogramWidget::TileTexture));
     ui->modeComboBox->addItem(tr("Aufspannen"), QVariant(StereogramWidget::StretchTexture));

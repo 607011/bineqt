@@ -341,8 +341,6 @@
      </spacer>
     </item>
    </layout>
-   <zorder></zorder>
-   <zorder>horizontalSpacer</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -445,7 +443,7 @@
   </action>
   <action name="actionPrintAutostereogram">
    <property name="text">
-    <string>Autostereogram</string>
+    <string>Autostereogramm</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>

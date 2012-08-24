@@ -6,10 +6,7 @@
 #include <QTime>
 #include <QtCore/QtDebug>
 #include "depthimagewidget.h"
-
-#ifndef _OPENMP
-#define _OPENMP
-#endif
+#include "globalsettings.h"
 
 #ifdef _OPENMP
 #include <omp.h>

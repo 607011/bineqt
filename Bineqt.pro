@@ -1,7 +1,7 @@
 # Copyright (c) 2012 Oliver Lau <oliver@von-und-fuer-lau.de>
 # All rights reserved.
 
-QT += core gui opengl multimedia
+QT += core gui opengl
 
 TARGET = Bineqt
 TEMPLATE = app
@@ -32,7 +32,8 @@ HEADERS += mainwindow.h \
     depthimagewidget.h \
     stereogramwidget.h \
     stereogramsaveform.h \
-    depthdata.h
+    depthdata.h \
+    globalsettings.h
 
 FORMS += mainwindow.ui \
     stereogramsaveform.ui
